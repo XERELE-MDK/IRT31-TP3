@@ -54,10 +54,10 @@ public class StudentDAOImpl implements StudentDAO{
     @Transactional
     public void delete(Integer id) {
         Student theStudent = entityManager.find(Student.class, id);
-        // 1. lire
-// TODO : gérer le cas theStudent == null (id inexistant) pour éviter un NPE
-        entityManager.remove(theStudent);
-        // 2. supprimer
+
+        if (theStudent != null) {
+            entityManager.remove(theStudent);
+        }
     }
 
     @Override

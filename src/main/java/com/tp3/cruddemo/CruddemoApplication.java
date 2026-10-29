@@ -19,15 +19,13 @@ public class CruddemoApplication {
     @Bean
     public CommandLineRunner commandLineRunner(StudentDAO studentDAO) {
         return args -> {
-            String action = (args.length > 0) ? args[0] : "read";
+            String action = (args.length > 0) ? args[0] : "create";
             switch (action) {
                 case "create" -> createStudent(studentDAO);
-                case "read"
-                        -> readStudents(studentDAO);
+                case "read" -> readStudents(studentDAO);
                 case "update" -> updateStudent(studentDAO);
                 case "delete" -> deleteStudent(studentDAO);
-                default
-                        -> System.out.println("Action inconnue: " + action);
+                default -> System.out.println("Action inconnue: " + action);
             }
         };
     }
@@ -37,8 +35,12 @@ public class CruddemoApplication {
         int studentId = 1;
 
         // Delete single student
-        studentDAO.delete(studentId);
-        System.out.println("Deleted student ID " + studentId + ". Verification findById: " + studentDAO.findById(studentId));
+        if (studentDAO.findById(studentId) == null) {
+            System.out.println("Student with ID " + studentId + " not found, nothing to delete.");
+        } else {
+            studentDAO.delete(studentId);
+            System.out.println("Deleted student ID " + studentId + ". Verification findById: " + studentDAO.findById(studentId));
+        }
 
         // Delete all students
         int rowsDeleted = studentDAO.deleteAll();
@@ -77,10 +79,10 @@ public class CruddemoApplication {
         doeStudents.forEach(System.out::println);
     }
 
-    private void createStudent(StudentDAO studentDAO){
-        Student tempStudent = new Student("Paul5","Doe","paul5@test.com");
+    private void createStudent(StudentDAO studentDAO) {
+        Student tempStudent = new Student("Paul5", "Doe", "paul5@test.com");
         studentDAO.save(tempStudent);
-        System.out.println("saved student. Generated id:"+ tempStudent.getId());
+        System.out.println("saved student. Generated id:" + tempStudent.getId());
 
         Student myStudent = studentDAO.findById(1);
         System.out.println("Found the student: " + myStudent);
@@ -91,13 +93,17 @@ public class CruddemoApplication {
         }
 
         List<Student> theStudent = studentDAO.findByLastName("Doe");
-        theStudents.forEach(System.out::println);
+        theStudent.forEach(System.out::println);
 
-        int studentId = 1;
+        int studentId = 3;
         Student myStudentSS = studentDAO.findById(studentId);
-        myStudentSS.setFirstName("John");
-        studentDAO.update(myStudentSS);
-        System.out.println("Updated student: " + studentDAO.findById(studentId));
+        if (myStudentSS != null) {
+            myStudentSS.setFirstName("John3");
+            studentDAO.update(myStudentSS);
+            System.out.println("Updated student: " + studentDAO.findById(studentId));
+        } else {
+            System.out.println("Student with ID " + studentId + " not found.");
+        }
 
         studentDAO.delete(1);
         System.out.println("After delete, findById(1) = " + studentDAO.findById(1));
